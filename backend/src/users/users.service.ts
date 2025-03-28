@@ -17,4 +17,9 @@ export class UsersService {
     this.users.push(newUser);
     return newUser;
   }
+
+  remove(id: number) {
+    this.users = this.users.filter(user => user.id !==id);
+    return { message: `User ${id} deleled successfully`}
+  }
 }

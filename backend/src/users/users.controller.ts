@@ -1,8 +1,15 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { CreateUserDto } from './create-user.dto';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiProperty,
+  ApiTags,
+} from '@nestjs/swagger';
 
-@ApiTags('Users')  // 📌 Catégorie dans Swagger
+@ApiTags('Users') // 📌 Catégorie dans Swagger
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -22,8 +29,15 @@ export class UsersController {
 
   @Post()
   @ApiOperation({ summary: 'Ajoute un nouvel utilisateur' })
-  @ApiBody({ schema: { example: { name: 'Charlie' } } })
-  create(@Body() createUserDto: { name: string }) {
+  @ApiBody({ type: CreateUserDto })
+  create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Supprime un utilisateur par son ID' })
+  @ApiParam({ name: 'id', required: true, example: 1 })
+  delete(@Param('id') id: string) {
+    return this.usersService.remove(+id);
   }
 }
