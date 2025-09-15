@@ -1,25 +1,34 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './user.entity';
+import { Repository } from 'typeorm';
+import { CreateUserDto } from './create-user.dto';
 
 @Injectable()
 export class UsersService {
-  private users = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }];
 
-  findAll() {
-    return this.users;
+  constructor(
+    @InjectRepository(User)
+    // Persistence des données dans une DB relationnelle (PostgreSQL, MySQL, SQLite, etc.)
+    private usersRepository: Repository<User>
+  ) {}
+  
+  findAll(): Promise<User[]> {
+    return this.usersRepository.find();
   }
 
-  findOne(id: number) {
-    return this.users.find(user => user.id === id);
+  findOne(id: number): Promise<User | null> {
+    return this.usersRepository.findOneBy({ id });
   }
 
-  create(user: { name: string }) {
-    const newUser = { id: this.users.length + 1, ...user };
-    this.users.push(newUser);
-    return newUser;
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const newUser = this.usersRepository.create(createUserDto);
+    return this.usersRepository.save(newUser);
   }
 
-  remove(id: number) {
-    this.users = this.users.filter(user => user.id !==id);
-    return { message: `User ${id} deleled successfully`}
+  async remove(id: number): Promise<{ message: string }> {
+    await this.usersRepository.delete(id);
+    return { message: `User ${id} deleted successfully` };
   }
 }
+

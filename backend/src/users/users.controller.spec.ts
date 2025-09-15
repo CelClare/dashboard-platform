@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 
+// Test de base généré automatiquement par NestJS CLI
+
 describe('UsersController', () => {
   let controller: UsersController;
 

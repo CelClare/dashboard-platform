@@ -9,6 +9,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+// 📌 Décorateurs Swagger pour la doc API
+// Les décorateurs Swagger permettent de décrire les endpoints de l'API et leurs paramètres
+
+
 @ApiTags('Users') // 📌 Catégorie dans Swagger
 @Controller('users')
 export class UsersController {
