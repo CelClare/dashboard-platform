@@ -9,7 +9,7 @@ export class UsersService {
 
   constructor(
     @InjectRepository(User)
-    // Persistence des données dans une DB relationnelle (PostgreSQL, MySQL, SQLite, etc.)
+    // Persistence des données dans une DB relationnelle (PostgreSQL ici) avec TypeORM
     private usersRepository: Repository<User>
   ) {}
   
