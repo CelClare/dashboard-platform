@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './create-user.dto';
+import { UpdateUserDto } from './update-user.dto';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class UsersService {
@@ -17,8 +19,12 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  findOne(id: number): Promise<User | null> {
+  findOne(id: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ id });
+  }
+
+  findByEmail(email: string): Promise<User | null> {
+    return this.usersRepository.findOneBy({ email });
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -26,7 +32,16 @@ export class UsersService {
     return this.usersRepository.save(newUser);
   }
 
-  async remove(id: number): Promise<{ message: string }> {
+  async update(id: string, updates: UpdateUserDto): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ id });
+
+    if (!user) throw new NotFoundException (`User ${id} not found`);
+
+    Object.assign(user, updates);
+    return this.usersRepository.save(user);
+  }
+
+  async remove(id: string): Promise<{ message: string }> {
     await this.usersRepository.delete(id);
     return { message: `User ${id} deleted successfully` };
   }
