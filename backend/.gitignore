@@ -42,6 +42,9 @@ lerna-debug.log*
 .env.production.local
 .env.local
 
+# Autoriser le fichier exemple
+!.env.example
+
 # temp directory
 .temp
 .tmp
