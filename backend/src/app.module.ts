@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { User } from './users/user.entity';
 import * as Joi from 'joi';
+import { AuthModule } from './auth/auth.module';
 
 // Les fichiers module de NestJS sont là pour relier les Controllers, services et imports de modules. 
 // NestJS permet ceci contrairement à d'autres frameworks où tout est dans un seul fichier : le main ou index.
@@ -21,6 +22,8 @@ import * as Joi from 'joi';
         DATABASE_USER: Joi.string().required(),
         DATABASE_PASSWORD: Joi.string().required(),
         DATABASE_NAME: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRES_IN: Joi.string().default('1h')
       }),
     }),
 
@@ -40,6 +43,7 @@ import * as Joi from 'joi';
     }),
 
     UsersModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
