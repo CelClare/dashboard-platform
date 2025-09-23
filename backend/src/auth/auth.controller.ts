@@ -23,8 +23,8 @@ export class AuthController {
     return this.auth.login(dto.email, dto.password);
   }
 
+  @ApiBearerAuth('jwt')
   @Get('profile')
-  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Get current user from JWT' })
   me(@Req() req: any) {

@@ -12,6 +12,14 @@ async function bootstrap() {
     .setTitle('Dashboard API')
     .setDescription('API pour gérer les utilisateurs')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'jwt', // 👈 nom du schéma, doit matcher @ApiBearerAuth('jwt') dans le controller
+    )
     .build();
 
   // 📌 Création et mise en place de Swagger
