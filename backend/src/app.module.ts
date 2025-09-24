@@ -5,6 +5,8 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/user.entity';
 import * as Joi from 'joi';
 import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './common/guards/roles.guards';
 
 // Les fichiers module de NestJS sont là pour relier les Controllers, services et imports de modules. 
 // NestJS permet ceci contrairement à d'autres frameworks où tout est dans un seul fichier : le main ou index.
@@ -13,6 +15,12 @@ import { AuthModule } from './auth/auth.module';
 // On importe aussi le module UsersModule qui contient le controller et service des utilisateurs.
 
 @Module({
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Patch, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import {
@@ -9,9 +9,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
-// 📌 Décorateurs Swagger pour la doc API
-// Les décorateurs Swagger permettent de décrire les endpoints de l'API et leurs paramètres
+// 📌 Décorateurs Swagger pour la doc API, ils permettent de décrire les endpoints de l'API et leurs paramètres
 
 
 @ApiTags('Users')
@@ -28,7 +29,7 @@ export class UsersController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Récupère un utilisateur par son ID' })
-  @ApiParam({ name: 'id', required: true, example: 'uuid-user-id' })
+  @ApiParam({ name: 'id', required: true, example: 'user-id' })
   @ApiResponse({ status: 200, description: 'Utilisateur récupéré avec succès.' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé.' })
   findOne(@Param('id') id: string) {
@@ -46,7 +47,7 @@ export class UsersController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Met à jour un utilisateur par son ID' })
-  @ApiParam({ name: 'id', required: true, example: 'uuid-user-id' })
+  @ApiParam({ name: 'id', required: true, example: 'user-id' })
   @ApiBody({ type: UpdateUserDto })
   @ApiResponse({ status: 200, description: 'Utilisateur mis à jour avec succès.' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé.' })
@@ -55,10 +56,12 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('ADMIN')
   @ApiOperation({ summary: 'Supprime un utilisateur par son ID' })
-  @ApiParam({ name: 'id', required: true, example: 'uuid-user-id' })
+  @ApiParam({ name: 'id', required: true, example: 'user-id' })
   @ApiResponse({ status: 200, description: 'Utilisateur supprimé avec succès.', schema: {
-  example: { message: 'User uuid-user-id deleted successfully' }
+  example: { message: 'User user-id deleted successfully' }
   }})
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé.' })
   delete(@Param('id') id: string) {
