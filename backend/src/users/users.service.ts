@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
@@ -37,27 +41,43 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    const newUser = this.usersRepository.create(createUserDto);
-    const savedUser = await this.usersRepository.save(newUser);
-    return {
-      success: true,
-      message: 'User created successfully',
-      data: savedUser,
-    };
+    try {
+      const newUser = this.usersRepository.create(createUserDto);
+      const savedUser = await this.usersRepository.save(newUser);
+      return {
+        success: true,
+        message: 'User created successfully',
+        data: savedUser,
+      };
+    } catch (error) {
+      if (error.code === '23505') {
+        // Code d'erreur pour violation de contrainte d'unicité dans PostgreSQL
+        throw new ConflictException('Email already exists');
+      }
+      throw error;
+    }
   }
 
   async update(id: string, updates: UpdateUserDto) {
-    const user = await this.usersRepository.findOneBy({ id });
-    if (!user) throw new NotFoundException(`User ${id} not found`);
+    try {
+      const user = await this.usersRepository.findOneBy({ id });
+      if (!user) throw new NotFoundException(`User ${id} not found`);
 
-    Object.assign(user, updates);
-    const updatedUser = await this.usersRepository.save(user);
+      Object.assign(user, updates);
+      const updatedUser = await this.usersRepository.save(user);
 
-    return {
-      success: true,
-      message: 'User updated successfully',
-      data: updatedUser,
-    };
+      return {
+        success: true,
+        message: 'User updated successfully',
+        data: updatedUser,
+      };
+    } catch (error) {
+      if (error.code === '23505') {
+        // Code d'erreur pour violation de contrainte d'unicité dans PostgreSQL
+        throw new ConflictException('Email already exists');
+      }
+      throw error;
+    }
   }
 
   async deactivate(id: string) {

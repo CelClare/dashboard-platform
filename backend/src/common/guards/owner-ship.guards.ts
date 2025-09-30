@@ -20,4 +20,5 @@ export class OwnershipGuard implements CanActivate {
 
     throw new ForbiddenException('Access denied: You do not own this resource.');
   }
+
 }
