@@ -4,18 +4,21 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
+  @Public()
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
   register(@Body() dto: CreateUserDto) {
     return this.auth.register(dto);
   }
 
+  @Public()
   @Post('login')
   @ApiOperation({ summary: 'Login and get a JWT' })
   @ApiBody({ type: LoginDto })

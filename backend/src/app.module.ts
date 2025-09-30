@@ -7,6 +7,7 @@ import * as Joi from 'joi';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './common/guards/roles.guards';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guards';
 
 // Les fichiers module de NestJS sont là pour relier les Controllers, services et imports de modules. 
 // NestJS permet ceci contrairement à d'autres frameworks où tout est dans un seul fichier : le main ou index.
@@ -16,6 +17,10 @@ import { RolesGuard } from './common/guards/roles.guards';
 
 @Module({
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: RolesGuard,

@@ -12,19 +12,33 @@ export class AuthService {
   ) {}
 
   async register(dto: CreateUserDto) {
-    // UsersService + entity s’occupent déjà du hash et du role par défaut
-    const user = await this.users.create(dto);
-    return { id: user.id, email: user.email, role: user.role, name: user.name };
-  }
+  const result = await this.users.create(dto);
+  return {
+    success: true,
+    message: 'User registered successfully',
+    data: {
+      id: result.data.id,
+      email: result.data.email,
+      role: result.data.role,
+      name: result.data.name,
+    },
+  };
+}
 
   async login(email: string, password: string) {
     const user = await this.users.findByEmail(email);
     if (!user) throw new UnauthorizedException('Invalid credentials');
+
     const ok = await argon2.verify(user.password, password);
     if (!ok) throw new UnauthorizedException('Invalid credentials');
 
     const payload = { sub: user.id, email: user.email, role: user.role };
     const access_token = await this.jwt.signAsync(payload);
-    return { access_token };
-  }
+    
+    return {
+      success: true,
+      message: 'Login successful',
+      data: { access_token },
+    };
+  }  
 }

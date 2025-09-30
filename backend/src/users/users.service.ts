@@ -7,42 +7,92 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-
   constructor(
     @InjectRepository(User)
     // Persistence des données dans une DB relationnelle (PostgreSQL ici) avec TypeORM
-    private usersRepository: Repository<User>
+    private usersRepository: Repository<User>,
   ) {}
-  
-  findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+
+  async findAll() {
+    const users = await this.usersRepository.find();
+    return {
+      success: true,
+      message: 'Users retrieved successfully',
+      data: users,
+    };
   }
 
-  findOne(id: string): Promise<User | null> {
-    return this.usersRepository.findOneBy({ id });
-  }
-
-  findByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOneBy({ email });
-  }
-
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const newUser = this.usersRepository.create(createUserDto);
-    return this.usersRepository.save(newUser);
-  }
-
-  async update(id: string, updates: UpdateUserDto): Promise<User> {
+  async findOne(id: string) {
     const user = await this.usersRepository.findOneBy({ id });
+    if (!user) throw new NotFoundException(`User ${id} not found`);
+    return {
+      success: true,
+      message: 'User retrieved successfully',
+      data: user,
+    };
+  }
 
-    if (!user) throw new NotFoundException (`User ${id} not found`);
+  async findByEmail(email: string) {
+    return this.usersRepository.findOneBy({ email }); // utilisé pour login
+  }
+
+  async create(createUserDto: CreateUserDto) {
+    const newUser = this.usersRepository.create(createUserDto);
+    const savedUser = await this.usersRepository.save(newUser);
+    return {
+      success: true,
+      message: 'User created successfully',
+      data: savedUser,
+    };
+  }
+
+  async update(id: string, updates: UpdateUserDto) {
+    const user = await this.usersRepository.findOneBy({ id });
+    if (!user) throw new NotFoundException(`User ${id} not found`);
 
     Object.assign(user, updates);
-    return this.usersRepository.save(user);
+    const updatedUser = await this.usersRepository.save(user);
+
+    return {
+      success: true,
+      message: 'User updated successfully',
+      data: updatedUser,
+    };
   }
 
-  async remove(id: string): Promise<{ message: string }> {
+  async deactivate(id: string) {
+    const user = await this.usersRepository.findOneBy({ id });
+    if (!user) throw new NotFoundException(`User ${id} not found`);
+
+    user.isActive = false;
+    const savedUser = await this.usersRepository.save(user);
+
+    return {
+      success: true,
+      message: `User ${id} has been deactivated`,
+      data: savedUser,
+    };
+  }
+
+  async restore(id: string) {
+    const user = await this.usersRepository.findOneBy({ id });
+    if (!user) throw new NotFoundException(`User ${id} not found`);
+
+    user.isActive = true;
+    const savedUser = await this.usersRepository.save(user);
+
+    return {
+      success: true,
+      message: `User ${id} has been reactivated`,
+      data: savedUser,
+    };
+  }
+
+  async remove(id: string) {
     await this.usersRepository.delete(id);
-    return { message: `User ${id} deleted successfully` };
+    return {
+      success: true,
+      message: `User ${id} deleted successfully`,
+    };
   }
 }
-
